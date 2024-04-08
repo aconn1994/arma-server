@@ -49,8 +49,37 @@ mkdir -p ~/".local/share/Arma 3" && mkdir -p ~/".local/share/Arma 3 - Other Prof
 script /dev/null
 screen -S armaserver
 cd arma3
-./arma3server -name=server -config=server.cfg
+./arma3server_x64 -name=server -config=server.cfg
+./arma3server_x64 -name=server -mod=@mod1 -mod=@mod2 -mod=@mod3 -config=server.cfg # with mods
+
 
 # Add Server Configuration
 cd ~/steamcmd/arma3
 nano server.cfg
+
+# MODS
+# Use WinSCP to connect to ec2 instance and move mods to "home/ubuntu/mods"
+
+# Move mods from root user to arma 3 instance
+sudo cp -r /home/ubuntu/mods /home/arma3/steamcmd/arma3/mods
+
+# Copy Keys
+sudo cp -r /home/ubuntu/mods/@<>/keys/<>.bikey /home/arma3/steamcmd/arma3/keys/<>.bikey
+
+# rename all to lowercase
+find . -depth -exec rename 's/(.*)\/([^\/]*)/$1\/\L$2/' {} \;
+
+# transfer ownership of mods to arma3 user
+chown -R arma3 /home/arma3/steamcmd/arma3/<mod-directory>
+
+# install pip
+sudo apt install python3-pip
+
+# Give all access to arma3 user
+sudo chmod 777 /home/arma3
+
+# Connect SSH
+ssh -i C:/Users/Adam/.ssh/windows-arma-server-key-openssh.ppk ubuntu@ec2-54-208-91-12.compute-1.amazonaws.com
+
+# launch arma3 antistasi server
+./arma3server_x64 -name=server -mod="mods/@antistasiultimatemod;" -mod="mods/@cbaa3;" -mod="mods/@duisquadradar;" -mod="mods/@enhancedmovement;" -mod="mods/@enhancedmovementrework;" -mod="mods/@jsrssoundmod;" -mod="mods/@jsrssoundmodrhsafrfmodpacksoundsupport;" -mod="mods/@jsrssoundmodrhsgrefmodpacksoundsupport;" -mod="mods/@jsrssoundmodrhssafmodpacksupport;" -mod="mods/@jsrssoundmodrhsusafmodpacksoundsupport" -mod=";mods/@removestamina;" -mod="mods/@rhsafrf;" -mod="mods/@rhsgref;" -mod="mods/@rhssaf;" -mod="mods/@rhsusaf;" -config=server.cfg
